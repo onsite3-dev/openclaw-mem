@@ -27,6 +27,9 @@ export declare class MemoryStore {
     search(query: string, limit?: number): SearchResult[];
     getByDate(date: string): Memory | null;
     getAll(): Memory[];
+    listDates(): string[];
+    searchByType(type: string): Memory[];
+    searchByConcept(concept: string): Memory[];
     getStats(): {
         totalMemories: number;
         dbSize: number;

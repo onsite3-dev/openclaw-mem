@@ -11,6 +11,12 @@ export declare class OpenClawMem {
     init(): Promise<void>;
     importMarkdown(): Promise<number>;
     search(query: string, limit?: number): import("./store/sqlite").SearchResult[];
+    listDates(): string[];
+    getByDate(date: string): import("./store/sqlite").Memory | null;
+    searchByType(type: string): import("./store/sqlite").Memory[];
+    searchByConcept(concept: string): import("./store/sqlite").Memory[];
+    exportJSON(): string;
+    exportMarkdown(): string;
     getStats(): {
         totalMemories: number;
         dbSize: number;

@@ -231,6 +231,83 @@ export class MemoryStore {
     return results;
   }
 
+  // 列出所有日期
+  listDates(): string[] {
+    if (!this.db) throw new Error('Database not initialized');
+
+    const stmt = this.db.prepare(`
+      SELECT DISTINCT date FROM memories 
+      WHERE date != 'core' AND date != 'unknown'
+      ORDER BY date DESC
+    `);
+
+    const dates: string[] = [];
+    
+    while (stmt.step()) {
+      const row = stmt.getAsObject();
+      dates.push(row.date as string);
+    }
+
+    stmt.free();
+    return dates;
+  }
+
+  // 按類型搜索
+  searchByType(type: string): Memory[] {
+    if (!this.db) throw new Error('Database not initialized');
+
+    const stmt = this.db.prepare(`
+      SELECT * FROM memories WHERE type = ? ORDER BY date DESC
+    `);
+
+    stmt.bind([type]);
+    const results: Memory[] = [];
+    
+    while (stmt.step()) {
+      const row = stmt.getAsObject();
+      results.push({
+        id: row.id as string,
+        date: row.date as string,
+        content: row.content as string,
+        type: row.type as string | undefined,
+        concept: row.concept as string | undefined,
+        files: row.files ? JSON.parse(row.files as string) : [],
+        created_at: row.created_at as number
+      });
+    }
+
+    stmt.free();
+    return results;
+  }
+
+  // 按概念搜索
+  searchByConcept(concept: string): Memory[] {
+    if (!this.db) throw new Error('Database not initialized');
+
+    const stmt = this.db.prepare(`
+      SELECT * FROM memories WHERE concept LIKE ? ORDER BY date DESC
+    `);
+
+    stmt.bind([`%${concept}%`]);
+    const results: Memory[] = [];
+    
+    while (stmt.step()) {
+      const row = stmt.getAsObject();
+      results.push({
+        id: row.id as string,
+        date: row.date as string,
+        content: row.content as string,
+        type: row.type as string | undefined,
+        concept: row.concept as string | undefined,
+        files: row.files ? JSON.parse(row.files as string) : [],
+        created_at: row.created_at as number
+      });
+    }
+
+    stmt.free();
+    return results;
+  }
+
   // 取得統計資訊
   getStats() {
     if (!this.db) throw new Error('Database not initialized');

@@ -189,6 +189,71 @@ class MemoryStore {
         stmt.free();
         return results;
     }
+    // 列出所有日期
+    listDates() {
+        if (!this.db)
+            throw new Error('Database not initialized');
+        const stmt = this.db.prepare(`
+      SELECT DISTINCT date FROM memories 
+      WHERE date != 'core' AND date != 'unknown'
+      ORDER BY date DESC
+    `);
+        const dates = [];
+        while (stmt.step()) {
+            const row = stmt.getAsObject();
+            dates.push(row.date);
+        }
+        stmt.free();
+        return dates;
+    }
+    // 按類型搜索
+    searchByType(type) {
+        if (!this.db)
+            throw new Error('Database not initialized');
+        const stmt = this.db.prepare(`
+      SELECT * FROM memories WHERE type = ? ORDER BY date DESC
+    `);
+        stmt.bind([type]);
+        const results = [];
+        while (stmt.step()) {
+            const row = stmt.getAsObject();
+            results.push({
+                id: row.id,
+                date: row.date,
+                content: row.content,
+                type: row.type,
+                concept: row.concept,
+                files: row.files ? JSON.parse(row.files) : [],
+                created_at: row.created_at
+            });
+        }
+        stmt.free();
+        return results;
+    }
+    // 按概念搜索
+    searchByConcept(concept) {
+        if (!this.db)
+            throw new Error('Database not initialized');
+        const stmt = this.db.prepare(`
+      SELECT * FROM memories WHERE concept LIKE ? ORDER BY date DESC
+    `);
+        stmt.bind([`%${concept}%`]);
+        const results = [];
+        while (stmt.step()) {
+            const row = stmt.getAsObject();
+            results.push({
+                id: row.id,
+                date: row.date,
+                content: row.content,
+                type: row.type,
+                concept: row.concept,
+                files: row.files ? JSON.parse(row.files) : [],
+                created_at: row.created_at
+            });
+        }
+        stmt.free();
+        return results;
+    }
     // 取得統計資訊
     getStats() {
         if (!this.db)

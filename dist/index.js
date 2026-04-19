@@ -67,6 +67,62 @@ class OpenClawMem {
         }
         return this.store.search(query, limit);
     }
+    // 列出所有日期
+    listDates() {
+        if (!this.enabled || !this.store) {
+            throw new Error('OpenClaw-Mem is not initialized');
+        }
+        return this.store.listDates();
+    }
+    // 按日期查看
+    getByDate(date) {
+        if (!this.enabled || !this.store) {
+            throw new Error('OpenClaw-Mem is not initialized');
+        }
+        return this.store.getByDate(date);
+    }
+    // 按類型搜索
+    searchByType(type) {
+        if (!this.enabled || !this.store) {
+            throw new Error('OpenClaw-Mem is not initialized');
+        }
+        return this.store.searchByType(type);
+    }
+    // 按概念搜索
+    searchByConcept(concept) {
+        if (!this.enabled || !this.store) {
+            throw new Error('OpenClaw-Mem is not initialized');
+        }
+        return this.store.searchByConcept(concept);
+    }
+    // 匯出為 JSON
+    exportJSON() {
+        if (!this.enabled || !this.store) {
+            throw new Error('OpenClaw-Mem is not initialized');
+        }
+        const memories = this.store.getAll();
+        return JSON.stringify(memories, null, 2);
+    }
+    // 匯出為 Markdown
+    exportMarkdown() {
+        if (!this.enabled || !this.store) {
+            throw new Error('OpenClaw-Mem is not initialized');
+        }
+        const memories = this.store.getAll();
+        let markdown = '# OpenClaw-Mem Export\n\n';
+        memories.forEach(mem => {
+            markdown += `## ${mem.date}\n\n`;
+            if (mem.type)
+                markdown += `**類型：** ${mem.type}\n`;
+            if (mem.concept)
+                markdown += `**概念：** ${mem.concept}\n`;
+            if (mem.files && mem.files.length > 0) {
+                markdown += `**檔案：** ${mem.files.join(', ')}\n`;
+            }
+            markdown += `\n${mem.content}\n\n---\n\n`;
+        });
+        return markdown;
+    }
     // 取得統計資訊
     getStats() {
         if (!this.enabled || !this.store) {
