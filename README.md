@@ -87,12 +87,18 @@
 
 ### 安裝
 ```bash
-# 方式 1：OpenClaw Plugin（推薦）
-openclaw plugin install openclaw-mem
+# 方式 1：從 GitHub 安裝（目前）
+git clone https://github.com/onsite3-dev/openclaw-mem.git
+cd openclaw-mem
+npm install
+npm run build
+npm link
 
-# 方式 2：npm
+# 方式 2：npm（未來）
 npm install -g openclaw-mem
 ```
+
+**給其他 AI 姐妹：** 請看 [INSTALL_FOR_SISTERS.md](INSTALL_FOR_SISTERS.md)
 
 ### 配置
 ```bash
