@@ -1,5 +1,6 @@
 import { MemoryStore } from './store/sqlite';
 import { MarkdownImporter } from './store/markdown';
+import { ConfigManager } from './config';
 import path from 'path';
 import os from 'os';
 
@@ -13,14 +14,16 @@ export class OpenClawMem {
   private store: MemoryStore | null = null;
   private config: OpenClawMemConfig;
   private enabled: boolean = false;
+  private configManager: ConfigManager;
 
   constructor(config?: Partial<OpenClawMemConfig>) {
-    const homeDir = os.homedir();
+    this.configManager = new ConfigManager();
+    const userConfig = this.configManager.load();
     
     this.config = {
-      enabled: config?.enabled ?? true,
-      dbPath: config?.dbPath ?? path.join(homeDir, '.openclaw/memory-store/store.db'),
-      memoryDir: config?.memoryDir ?? path.join(homeDir, '.openclaw/workspace/memory')
+      enabled: config?.enabled ?? userConfig.enabled,
+      dbPath: config?.dbPath ?? userConfig.dbPath,
+      memoryDir: config?.memoryDir ?? userConfig.memoryDir
     };
   }
 

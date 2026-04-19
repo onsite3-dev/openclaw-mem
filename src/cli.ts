@@ -2,6 +2,7 @@
 
 import { Command } from 'commander';
 import { OpenClawMem } from './index';
+import { addConfigCommands } from './config-cli-commands';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
@@ -12,6 +13,9 @@ program
   .name('openclaw-mem')
   .description('OpenClaw Memory System')
   .version('0.3.0');
+
+// 加入 config 指令群組
+addConfigCommands(program);
 
 // init 指令
 program

@@ -39,6 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const index_1 = require("./index");
+const config_cli_commands_1 = require("./config-cli-commands");
 const path_1 = __importDefault(require("path"));
 const os_1 = __importDefault(require("os"));
 const fs_1 = __importDefault(require("fs"));
@@ -47,6 +48,8 @@ program
     .name('openclaw-mem')
     .description('OpenClaw Memory System')
     .version('0.3.0');
+// 加入 config 指令群組
+(0, config_cli_commands_1.addConfigCommands)(program);
 // init 指令
 program
     .command('init')

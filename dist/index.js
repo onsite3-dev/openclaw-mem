@@ -13,24 +13,21 @@ var __createBinding = (this && this.__createBinding) || (Object.create ? (functi
 var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OpenClawMem = void 0;
 const sqlite_1 = require("./store/sqlite");
 const markdown_1 = require("./store/markdown");
-const path_1 = __importDefault(require("path"));
-const os_1 = __importDefault(require("os"));
+const config_1 = require("./config");
 class OpenClawMem {
     constructor(config) {
         this.store = null;
         this.enabled = false;
-        const homeDir = os_1.default.homedir();
+        this.configManager = new config_1.ConfigManager();
+        const userConfig = this.configManager.load();
         this.config = {
-            enabled: config?.enabled ?? true,
-            dbPath: config?.dbPath ?? path_1.default.join(homeDir, '.openclaw/memory-store/store.db'),
-            memoryDir: config?.memoryDir ?? path_1.default.join(homeDir, '.openclaw/workspace/memory')
+            enabled: config?.enabled ?? userConfig.enabled,
+            dbPath: config?.dbPath ?? userConfig.dbPath,
+            memoryDir: config?.memoryDir ?? userConfig.memoryDir
         };
     }
     // 初始化

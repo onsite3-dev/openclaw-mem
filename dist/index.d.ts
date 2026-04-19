@@ -7,6 +7,7 @@ export declare class OpenClawMem {
     private store;
     private config;
     private enabled;
+    private configManager;
     constructor(config?: Partial<OpenClawMemConfig>);
     init(): Promise<void>;
     importMarkdown(): Promise<number>;
