@@ -35,6 +35,9 @@ export declare class MemoryStore {
         dbSize: number;
         dbPath: string;
     };
+    getRelated(memoryId: string, limit?: number): Memory[];
+    markMemory(memoryId: string, tags: string[]): void;
+    getMarkedMemories(tag: string): Memory[];
     close(): void;
 }
 //# sourceMappingURL=sqlite.d.ts.map

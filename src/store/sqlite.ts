@@ -332,6 +332,134 @@ export class MemoryStore {
     };
   }
 
+  // 取得相關記憶（基於內容相似度）
+  getRelated(memoryId: string, limit: number = 5): Memory[] {
+    if (!this.db) throw new Error('Database not initialized');
+
+    // 先取得目標記憶
+    const targetStmt = this.db.prepare('SELECT * FROM memories WHERE id = ?');
+    targetStmt.bind([memoryId]);
+    
+    let target: Memory | null = null;
+    if (targetStmt.step()) {
+      const row = targetStmt.getAsObject();
+      target = {
+        id: row.id as string,
+        date: row.date as string,
+        content: row.content as string,
+        type: row.type as string | undefined,
+        concept: row.concept as string | undefined,
+        files: row.files ? JSON.parse(row.files as string) : [],
+        created_at: row.created_at as number
+      };
+    }
+    targetStmt.free();
+
+    if (!target) return [];
+
+    // 提取關鍵詞
+    const keywords = target.content
+      .split(/\s+/)
+      .filter(w => w.length > 2)
+      .slice(0, 10);
+
+    if (keywords.length === 0) return [];
+
+    // 搜索包含相似關鍵詞的記憶
+    const keyword = keywords[0];
+    const stmt = this.db.prepare(`
+      SELECT * FROM memories 
+      WHERE id != ? 
+      AND content LIKE ?
+      ORDER BY date DESC
+      LIMIT ?
+    `);
+
+    stmt.bind([memoryId, `%${keyword}%`, limit]);
+    const results: Memory[] = [];
+    
+    while (stmt.step()) {
+      const row = stmt.getAsObject();
+      results.push({
+        id: row.id as string,
+        date: row.date as string,
+        content: row.content as string,
+        type: row.type as string | undefined,
+        concept: row.concept as string | undefined,
+        files: row.files ? JSON.parse(row.files as string) : [],
+        created_at: row.created_at as number
+      });
+    }
+
+    stmt.free();
+    return results;
+  }
+
+  // 標記記憶
+  markMemory(memoryId: string, tags: string[]): void {
+    if (!this.db) throw new Error('Database not initialized');
+
+    // 檢查 tags 欄位是否存在
+    const checkStmt = this.db.prepare("PRAGMA table_info(memories)");
+    let hasTagsColumn = false;
+    
+    while (checkStmt.step()) {
+      const row = checkStmt.getAsObject();
+      if (row.name === 'tags') {
+        hasTagsColumn = true;
+        break;
+      }
+    }
+    checkStmt.free();
+
+    // 如果沒有 tags 欄位，先加入
+    if (!hasTagsColumn) {
+      this.db.exec("ALTER TABLE memories ADD COLUMN tags TEXT");
+      this.save();
+    }
+
+    // 更新標記
+    const stmt = this.db.prepare(`
+      UPDATE memories SET tags = ? WHERE id = ?
+    `);
+    
+    stmt.bind([JSON.stringify(tags), memoryId]);
+    stmt.step();
+    stmt.free();
+
+    this.save();
+  }
+
+  // 取得標記的記憶
+  getMarkedMemories(tag: string): Memory[] {
+    if (!this.db) throw new Error('Database not initialized');
+
+    const stmt = this.db.prepare(`
+      SELECT * FROM memories 
+      WHERE tags LIKE ?
+      ORDER BY date DESC
+    `);
+
+    stmt.bind([`%"${tag}"%`]);
+    const results: Memory[] = [];
+    
+    while (stmt.step()) {
+      const row = stmt.getAsObject();
+      results.push({
+        id: row.id as string,
+        date: row.date as string,
+        content: row.content as string,
+        type: row.type as string | undefined,
+        concept: row.concept as string | undefined,
+        files: row.files ? JSON.parse(row.files as string) : [],
+        created_at: row.created_at as number
+      });
+    }
+
+    stmt.free();
+    return results;
+  }
+
   // 關閉資料庫
   close() {
     if (this.db) {

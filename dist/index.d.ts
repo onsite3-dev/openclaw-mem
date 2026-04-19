@@ -22,6 +22,9 @@ export declare class OpenClawMem {
         dbSize: number;
         dbPath: string;
     };
+    getRelated(memoryId: string, limit?: number): import("./store/sqlite").Memory[];
+    markMemory(memoryId: string, tags: string[]): void;
+    getMarkedMemories(tag: string): import("./store/sqlite").Memory[];
     close(): void;
     isEnabled(): boolean;
 }

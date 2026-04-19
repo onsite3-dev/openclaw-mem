@@ -1,6 +1,6 @@
 {
   "name": "openclaw-mem",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Cross-session memory system for OpenClaw",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

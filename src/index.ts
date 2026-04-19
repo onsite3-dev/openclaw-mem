@@ -145,6 +145,33 @@ export class OpenClawMem {
     return this.store.getStats();
   }
 
+  // 取得相關記憶
+  getRelated(memoryId: string, limit: number = 5) {
+    if (!this.enabled || !this.store) {
+      throw new Error('OpenClaw-Mem is not initialized');
+    }
+
+    return this.store.getRelated(memoryId, limit);
+  }
+
+  // 標記記憶
+  markMemory(memoryId: string, tags: string[]) {
+    if (!this.enabled || !this.store) {
+      throw new Error('OpenClaw-Mem is not initialized');
+    }
+
+    return this.store.markMemory(memoryId, tags);
+  }
+
+  // 取得標記的記憶
+  getMarkedMemories(tag: string) {
+    if (!this.enabled || !this.store) {
+      throw new Error('OpenClaw-Mem is not initialized');
+    }
+
+    return this.store.getMarkedMemories(tag);
+  }
+
   // 關閉
   close() {
     if (this.store) {
