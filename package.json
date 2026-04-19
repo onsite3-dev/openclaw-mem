@@ -1,0 +1,46 @@
+{
+  "name": "openclaw-mem",
+  "version": "0.1.0",
+  "description": "Cross-session memory system for OpenClaw",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "openclaw-mem": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts"
+  },
+  "keywords": [
+    "openclaw",
+    "memory",
+    "ai",
+    "llm",
+    "vector-search",
+    "sqlite",
+    "chroma"
+  ],
+  "author": "Annie <onsite3@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/onsite3-dev/openclaw-mem.git"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.0.0",
+    "chromadb": "^1.8.0",
+    "commander": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.8",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
