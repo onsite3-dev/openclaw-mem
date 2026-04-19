@@ -1,0 +1,96 @@
+import { MemoryStore } from './store/sqlite';
+import { MarkdownImporter } from './store/markdown';
+import path from 'path';
+import os from 'os';
+
+export interface OpenClawMemConfig {
+  enabled: boolean;
+  dbPath: string;
+  memoryDir: string;
+}
+
+export class OpenClawMem {
+  private store: MemoryStore | null = null;
+  private config: OpenClawMemConfig;
+  private enabled: boolean = false;
+
+  constructor(config?: Partial<OpenClawMemConfig>) {
+    const homeDir = os.homedir();
+    
+    this.config = {
+      enabled: config?.enabled ?? true,
+      dbPath: config?.dbPath ?? path.join(homeDir, '.openclaw/memory-store/store.db'),
+      memoryDir: config?.memoryDir ?? path.join(homeDir, '.openclaw/workspace/memory')
+    };
+  }
+
+  // 初始化
+  async init(): Promise<void> {
+    if (!this.config.enabled) {
+      console.log('OpenClaw-Mem is disabled');
+      return;
+    }
+
+    console.log('Initializing OpenClaw-Mem...');
+    this.store = new MemoryStore(this.config.dbPath);
+    await this.store.init();
+    this.enabled = true;
+    console.log('✅ OpenClaw-Mem initialized');
+  }
+
+  // 匯入 Markdown 記憶
+  async importMarkdown(): Promise<number> {
+    if (!this.enabled || !this.store) {
+      throw new Error('OpenClaw-Mem is not initialized');
+    }
+
+    console.log(`Importing memories from ${this.config.memoryDir}...`);
+    
+    const importer = new MarkdownImporter(this.config.memoryDir);
+    const memories = await importer.importAll();
+
+    console.log(`Found ${memories.length} memories`);
+    
+    if (memories.length > 0) {
+      this.store.addBatch(memories);
+      console.log(`✅ Imported ${memories.length} memories`);
+    }
+
+    return memories.length;
+  }
+
+  // 搜索
+  search(query: string, limit: number = 10) {
+    if (!this.enabled || !this.store) {
+      throw new Error('OpenClaw-Mem is not initialized');
+    }
+
+    return this.store.search(query, limit);
+  }
+
+  // 取得統計資訊
+  getStats() {
+    if (!this.enabled || !this.store) {
+      throw new Error('OpenClaw-Mem is not initialized');
+    }
+
+    return this.store.getStats();
+  }
+
+  // 關閉
+  close() {
+    if (this.store) {
+      this.store.close();
+      this.enabled = false;
+    }
+  }
+
+  // 檢查狀態
+  isEnabled(): boolean {
+    return this.enabled;
+  }
+}
+
+// 匯出類型
+export * from './store/sqlite';
+export * from './store/markdown';
